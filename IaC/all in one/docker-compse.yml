@@ -1,21 +1,47 @@
+version: "3.8"
+
+services:
+ 
   webtop:
     image: lscr.io/linuxserver/webtop:latest
     container_name: webtop
     security_opt:
-      - seccomp:unconfined # optional
+      - seccomp:unconfined
     environment:
       - PUID=1000
       - PGID=1000
       - TZ=Etc/UTC
-      - SUBFOLDER=/ # optional
-      - TITLE=Webtop # optional
+      - SUBFOLDER=/
+      - TITLE=Webtop
     volumes:
-      - /path/to/data:/config
-      - /var/run/docker.sock:/var/run/docker.sock # optional
+      - ./webtop-config:/config
+      - /var/run/docker.sock:/var/run/docker.sock
     ports:
       - 3000:3000
       - 3001:3001
     devices:
-      - /dev/dri:/dev/dri # optional
-    shm_size: "1gb" # optional
+      - /dev/dri:/dev/dri
+    shm_size: "1gb"
+    restart: unless-stopped
+
+  
+  kali:
+    image: kalilinux/kali-rolling
+    container_name: kali
+    tty: true
+    stdin_open: true
+    restart: unless-stopped
+
+  
+  heimdall:
+    image: linuxserver/heimdall
+    container_name: heimdall
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+    volumes:
+      - ./heimdall-config:/config
+    ports:
+      - 8080:80
     restart: unless-stopped
