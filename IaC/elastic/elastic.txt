@@ -1,0 +1,49 @@
+ #سكربت Bash شامل لتثبيت ELK Stack على Ubuntu 24.04 
+ frome : https://www.fosstechnix.com/how-to-install-elastic-stack-on-ubuntu-24-04/
+
+ #!/bin/bash
+
+set -e
+
+echo "🔧 تحديث النظام..."
+sudo apt update && sudo apt upgrade -y
+
+echo "☕️ تثبيت Java OpenJDK 21..."
+sudo apt install -y openjdk-21-jdk
+java -version
+
+echo "🔑 إضافة مفتاح GPG الخاص بـ Elastic..."
+wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo gpg --dearmor -o /usr/share/keyrings/elastic.gpg
+
+echo "📦 إضافة مستودع ELK إلى APT..."
+echo "deb [signed-by=/usr/share/keyrings/elastic.gpg] https://artifacts.elastic.co/packages/8.x/apt stable main" | sudo tee /etc/apt/sources.list.d/elastic-8.x.list
+
+echo "🔄 تحديث المستودعات..."
+sudo apt update
+
+echo "📥 تثبيت Elasticsearch..."
+sudo apt install -y elasticsearch
+
+echo "⚙️ تفعيل وتشغيل Elasticsearch..."
+sudo systemctl enable elasticsearch
+sudo systemctl start elasticsearch
+
+echo "📥 تثبيت Kibana..."
+sudo apt install -y kibana
+
+echo "⚙️ تفعيل وتشغيل Kibana..."
+sudo systemctl enable kibana
+sudo systemctl start kibana
+
+echo "📥 تثبيت Logstash..."
+sudo apt install -y logstash
+
+echo "⚙️ تفعيل وتشغيل Logstash..."
+sudo systemctl enable logstash
+sudo systemctl start logstash
+
+echo "🔒 تمكين الجدار الناري للمنفذ 5601 (Kibana)..."
+sudo ufw allow 5601/tcp
+sudo ufw reload
+
+echo "✅ تم تثبيت ELK Stack بنجاح!"
